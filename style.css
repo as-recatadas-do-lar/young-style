@@ -196,7 +196,7 @@ footer {
 .fav-btn {
   background: none;
   border: none;
-  font-size: 24px;
+ font-size: 24px;
   cursor: pointer;
   color: #888;
   transition: color 0.3s ease;
@@ -204,4 +204,5 @@ footer {
 
 .fav-btn:hover {
   color: #0e0001;
+}
 }
