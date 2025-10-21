@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Carrinho - Loja de Camisas</title>
+<style>
+  /* Estilos básicos (coerentes com index.html) */
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f0f0f0;color:#222}
+  header{background:#111;color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+  header img.logo{width:60px;height:60px}
+  .header-right{display:flex;align-items:center;gap:10px}
+  .icon-btn{background:transparent;border:none;color:white;cursor:pointer;position:relative;padding:6px;display:inline-flex;align-items:center;justify-content:center}
+  .icon-btn svg{width:22px;height:22px;fill:white}
+  .badge{position:absolute;top:-6px;right:-6px;background:#ff4060;color:#fff;font-size:11px;padding:2px 6px;border-radius:12px;line-height:1}
+  .btn-login{background:#2a7a2a;color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;font-weight:700}
+  main{max-width:1000px;margin:20px auto;padding:0 16px}
+  h1{margin:8px 0 20px}
+  #carrinho-container{display:flex;flex-direction:column;gap:12px}
+  .item{background:#fff;border-radius:6px;padding:12px;display:flex;gap:12px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+  .item img{width:110px;height:80px;object-fit:contain;border-radius:4px;background:#fafafa}
+  .info{flex:1}
+  .info h3{margin:0 0 6px;font-size:16px}
+  .info .preco{color:#2a7a2a;font-weight:700}
+  .controles{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+  .qtd{display:flex;align-items:center;gap:6px}
+  .qtd button{width:30px;height:30px;border-radius:4px;border:1px solid #ccc;background:#fff;cursor:pointer}
+  .qtd span{min-width:26px;text-align:center;display:inline-block}
+  .btn-remover{background:transparent;border:1px solid #d33;color:#d33;padding:6px 8px;border-radius:4px;cursor:pointer}
+  #total-container{margin-top:18px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  #total-container h2{margin:0}
+  .btn-primario{background:#2a7a2a;color:#fff;border:none;padding:10px 14px;border-radius:6px;cursor:pointer;font-weight:700}
+  .acoes{display:flex;gap:8px;align-items:center}
+  .vazio{background:#fff;padding:20px;border-radius:6px;text-align:center}
+  @media(max-width:700px){ .item{flex-direction:column;align-items:flex-start} .controles{align-self:stretch;flex-direction:row;justify-content:space-between;width:100%} }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" title="Voltar à loja"><img class="logo" src="86881303-f6ef-452b-9ed1-5a2f4643ad19.png" alt="Logo" /></a>
+
+  <div class="header-right" aria-hidden="false">
+    <button class="icon-btn" id="btn-fav-header" aria-label="Favoritos">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.1 21.35l-1.1-.99C5.14 15.02 2 12.28 2 8.5 2 6.01 4.01 4 6.5 4c1.74 0 3.41.81 4.5 2.09C12.09 4.81 13.76 4 15.5 4 17.99 4 20 6.01 20 8.5c0 3.78-3.14 6.52-8.9 11.86l-1 1z"/></svg>
+      <span class="badge" id="badge-favoritos">0</span>
+    </button>
+
+    <button class="icon-btn" id="btn-carr-header" aria-label="Carrinho">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h-2l-1 2h2l3.6 7.59-1.35 2.45A1 1 0 0010 18h8v-2h-7.42l.9-1.56L18 6H6.21l-.94-2zM7 20a2 2 0 110 4 2 2 0 010-4zm10 0a2 2 0 110 4 2 2 0 010-4z"/></svg>
+      <span class="badge" id="badge-carrinho">0</span>
+    </button>
+
+    <button class="btn-login" id="btn-login">Entrar</button>
+  </div>
+</header>
+
+<main>
+  <h1>Seu Carrinho</h1>
+
+  <div id="carrinho-container" aria-live="polite"></div>
+
+  <div id="total-container">
+    <div class="acoes">
+      <a href="index.html" class="btn-primario" style="background:#555;text-decoration:none;padding:10px 12px;display:inline-block;border-radius:6px;color:#fff">Continuar comprando</a>
+      <button id="btn-limpar" class="btn-remover" title="Esvaziar carrinho">Esvaziar carrinho</button>
+    </div>
+    <div>
+      <h2>Total: <span id="total">R$ 0,00</span></h2>
+      <div style="margin-top:8px;text-align:right">
+        <button id="btn-finalizar" class="btn-primario">Finalizar Compra</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer style="background:#111;color:#fff;text-align:center;padding:14px 0;margin-top:28px">© 2025 Loja de Camisas. Todos os direitos reservados.</footer>
+
+<script>
+/* Lê carrinho como armazenado pelo index (array de itens; cada adição cria uma entrada).
+   Aqui normalizamos para apresentar quantidade, mas ao salvar voltamos ao formato "repetido"
+   para manter compatibilidade com index.html. */
+
+function lerCarrinhoBruto(){
+  try{
+    return JSON.parse(localStorage.getItem('carrinho')) || [];
+  }catch(e){
+    return [];
+  }
+}
+
+function salvarCarrinhoBruto(arr){
+  localStorage.setItem('carrinho', JSON.stringify(arr));
+}
+
+/* Normaliza: agrupa por id */
+function normalizar(bruto){
+  const mapa = new Map();
+  bruto.forEach(it=>{
+    const id = it.id ?? it.productId ?? null;
+    if (id == null) return;
+    if (!mapa.has(id)){
+      mapa.set(id, { id, nome: it.nome || it.title || 'Produto', preco: it.preco || 'R$ 0,00', img: it.img || it.image || 'https://via.placeholder.com/110x80?text=Produto', qty: 0 });
+    }
+    mapa.get(id).qty += 1;
+  });
+  return Array.from(mapa.values());
+}
+
+function parsePrecoToNumber(precoStr){
+  if (typeof precoStr === 'number') return precoStr;
+  if (!precoStr) return 0;
+  // remover tudo que não seja dígito, vírgula ou ponto
+  const cleaned = precoStr.replace(/[^0-9.,-]/g, '').trim();
+  // se tiver vírgula e ponto, presumir formato milhar com ponto e decimal com vírgula
+  if (cleaned.indexOf(',') > -1 && cleaned.indexOf('.') > -1){
+    // trocar pontos por nada e vírgula por ponto
+    return parseFloat(cleaned.replace(/\./g,'').replace(',', '.')) || 0;
+  }
+  // trocar vírgula por ponto
+  const dot = cleaned.replace(',', '.');
+  return parseFloat(dot) || 0;
+}
+
+function formatCurrency(num){
+  return 'R$ ' + num.toFixed(2).replace('.', ',');
+}
+
+/* Renderiza carrinho na página */
+function renderizar(){
+  const bruto = lerCarrinhoBruto();
+  const itens = normalizar(bruto);
+  const container = document.getElementById('carrinho-container');
+  container.innerHTML = '';
+
+  atualizarBadges(bruto.length, JSON.parse(localStorage.getItem('favoritos') || '[]').length);
+
+  if (itens.length === 0){
+    container.innerHTML = '<div class="vazio"><strong>Seu carrinho está vazio.</strong><p>Adicione produtos na página principal.</p></div>';
+    document.getElementById('total').textContent = formatCurrency(0);
+    return;
+  }
+
+  itens.forEach(item=>{
+    const precoNum = parsePrecoToNumber(item.preco);
+    const itemEl = document.createElement('div');
+    itemEl.className = 'item';
+    itemEl.innerHTML = `
+      <img src="${item.img}" alt="${item.nome}" />
+      <div class="info">
+        <h3>${item.nome}</h3>
+        <div class="preco">${item.preco} <small style="color:#666">(${formatCurrency(precoNum)} un.)</small></div>
+      </div>
+      <div class="controles">
+        <div class="qtd" data-id="${item.id}">
+          <button class="btn-dec" title="Diminuir">−</button>
+          <span class="count">${item.qty}</span>
+          <button class="btn-inc" title="Aumentar">+</button>
+        </div>
+        <button class="btn-remover" data-id="${item.id}">Remover</button>
+      </div>
+    `;
+    container.appendChild(itemEl);
+  });
+
+  atualizarTotal();
+  ligarEventos();
+}
+
+function atualizarTotal(){
+  const bruto = lerCarrinhoBruto();
+  const itens = normalizar(bruto);
+  let total = 0;
+  itens.forEach(it => {
+    total += parsePrecoToNumber(it.preco) * it.qty;
+  });
+  document.getElementById('total').textContent = formatCurrency(total);
+}
+
+/* Eventos dos controles */
+function ligarEventos(){
+  document.querySelectorAll('.btn-inc').forEach(btn=>{
+    btn.onclick = (e)=>{
+      const id = parseInt(btn.parentElement.dataset.id);
+      // encontrar item exemplo no bruto
+      const bruto = lerCarrinhoBruto();
+      const exemplo = bruto.find(x=>x.id==id);
+      if (exemplo){
+        bruto.push(Object.assign({}, exemplo)); // adiciona uma entrada igual
+        salvarCarrinhoBruto(bruto);
+        renderizar();
+      }
+    };
+  });
+  document.querySelectorAll('.btn-dec').forEach(btn=>{
+    btn.onclick = (e)=>{
+      const id = parseInt(btn.parentElement.dataset.id);
+      let bruto = lerCarrinhoBruto();
+      // remove primeira ocorrência do id
+      const idx = bruto.findIndex(x=>x.id==id);
+      if (idx > -1){
+        bruto.splice(idx,1);
+        salvarCarrinhoBruto(bruto);
+        renderizar();
+      }
+    };
+  });
+  document.querySelectorAll('.btn-remover').forEach(btn=>{
+    btn.onclick = (e)=>{
+      const id = parseInt(btn.dataset.id);
+      let bruto = lerCarrinhoBruto();
+      bruto = bruto.filter(x=>x.id != id);
+      salvarCarrinhoBruto(bruto);
+      renderizar();
+    };
+  });
+}
+
+/* Atualiza badges do header */
+function atualizarBadges(qtdCarrinho, qtdFav){
+  const bc = document.getElementById('badge-carrinho');
+  const bf = document.getElementById('badge-favoritos');
+  if (bc) bc.textContent = (qtdCarrinho == null ? (lerCarrinhoBruto().length) : qtdCarrinho);
+  if (bf) bf.textContent = (qtdFav == null ? (JSON.parse(localStorage.getItem('favoritos')||'[]').length) : qtdFav);
+}
+
+/* Ações de botão finalização / limpar */
+document.getElementById('btn-limpar').addEventListener('click', ()=>{
+  if (!confirm('Deseja esvaziar o carrinho?')) return;
+  localStorage.removeItem('carrinho');
+  renderizar();
+});
+
+document.getElementById('btn-finalizar').addEventListener('click', ()=>{
+  const bruto = lerCarrinhoBruto();
+  if (bruto.length === 0){
+    alert('Seu carrinho está vazio.');
+    return;
+  }
+  const email = JSON.parse(localStorage.getItem('usuario') || 'null');
+  const identificacao = email && email.email ? email.email : prompt('Informe seu e-mail para finalizar (mock):') || 'comprador';
+  if (!identificacao) return;
+  // Simula finalização
+  alert('Compra finalizada (mock).\nObrigado, ' + (identificacao.email || identificacao));
+  // limpa carrinho
+  localStorage.removeItem('carrinho');
+  renderizar();
+});
+
+/* Login header (mesma lógica do index) */
+document.getElementById('btn-login').addEventListener('click', ()=>{
+  const email = prompt('Informe seu e-mail para entrar (mock):');
+  if (email){
+    localStorage.setItem('usuario', JSON.stringify({ email }));
+    alert('Logado como: ' + email);
+    // atualizar (perfil não exibido nesta página header minimal)
+  }
+});
+
+/* Inicia renderização */
+renderizar();
+</script>
+
+</body>
+</html>

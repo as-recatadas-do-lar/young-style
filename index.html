@@ -4,72 +4,501 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Loja de Camisas</title>
-<link rel="stylesheet" href="style.css" />
+<style>
+  /* Reset básico */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f0f0f0;
+    color: #222;
+  }
+
+  /* Header */
+  header {
+    background: #111;
+    color: white;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  header img.logo {
+    width: 60px;
+    height: 60px;
+  }
+
+  .search-container {
+    position: relative;
+  }
+  .search-container input[type="search"] {
+    padding: 6px 32px 6px 10px;
+    border-radius: 4px;
+    border: none;
+    font-size: 14px;
+  }
+  .search-container button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0 8px;
+  }
+  .search-container button img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .perfil {
+    color: white;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+  }
+
+  /* Header right: ícones e login */
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .icon-btn {
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    position: relative;
+    padding: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icon-btn svg {
+    width: 22px;
+    height: 22px;
+    display: block;
+    fill: white;
+  }
+  .badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #ff4060;
+    color: white;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 12px;
+    line-height: 1;
+  }
+  .btn-login {
+    background: #2a7a2a;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  /* Sidebar */
+  aside {
+    background: #111;
+    color: white;
+    width: 180px;
+    padding: 20px;
+    border-radius: 6px;
+    margin: 16px;
+  }
+  aside h2 {
+    margin-top: 0;
+    font-size: 20px;
+    border-bottom: 1px solid white;
+    padding-bottom: 6px;
+  }
+  aside ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 16px 0 0 0;
+  }
+  aside ul li {
+    border-bottom: 1px solid #555;
+    padding: 10px 0;
+    cursor: pointer;
+  }
+  aside ul li:hover {
+    text-decoration: underline;
+  }
+
+  /* Main */
+  main {
+    flex-grow: 1;
+    margin: 16px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .container {
+    display: flex;
+  }
+
+  /* Produto */
+  .produto {
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+    width: 220px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .produto img {
+    width: 180px;
+    height: 140px;
+    object-fit: contain;
+    border-radius: 4px;
+  }
+  .produto h3 {
+    margin: 12px 0 8px 0;
+    font-size: 18px;
+    text-align: center;
+  }
+  .produto .preco {
+    color: #2a7a2a;
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+  .produto button {
+    background: #2a7a2a;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .produto button:hover {
+    background: #216621;
+  }
+  .favorito {
+    cursor: pointer;
+    font-size: 24px;
+    margin-left: 10px;
+    user-select: none;
+    transition: transform 0.2s ease;
+  }
+  .favorito.favorito-ativo {
+    color: #ff4060;
+    transform: scale(1.3);
+  }
+
+  /* Rodapé */
+  footer {
+    background: #111;
+    color: white;
+    text-align: center;
+    padding: 14px 0;
+    font-size: 14px;
+  }
+
+  /* Layout principal */
+  .conteudo-principal {
+    display: flex;
+    max-width: 1200px;
+    margin: auto;
+  }
+
+  /* Responsive */
+  @media (max-width: 800px) {
+    .conteudo-principal {
+      flex-direction: column;
+      align-items: center;
+    }
+    aside {
+      width: 100%;
+      margin: 16px 0;
+    }
+    main {
+      margin: 16px 0;
+      justify-content: center;
+    }
+    .header-right { gap: 6px; }
+    .icon-btn svg { width: 20px; height: 20px; }
+  }
+</style>
 </head>
 <body>
 
 <header>
-  <div class="logo">
-    <img src="imagens/logo.png" alt="Logo" />
+  <img class="logo" src="imagens/logo.png" alt="Logo" />
+  <div class="search-container">
+    <input id="searchInput" type="search" placeholder="Buscar..." aria-label="Buscar produtos" />
+    <button id="btnSearch" aria-label="Buscar">
+      <img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" alt="Buscar" />
+    </button>
   </div>
-  <div class="search-bar">
-    <input type="text" placeholder="Buscar..." />
-    <button>🔍</button>
-  </div>
-  <div class="profile">
-    <a href="#">Perfil ▼</a>
+
+  <div class="header-right">
+    <button class="icon-btn" id="btn-favoritos" aria-label="Ver favoritos">
+      <!-- ícone de coração -->
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12.1 21.35l-1.1-.99C5.14 15.02 2 12.28 2 8.5 2 6.01 4.01 4 6.5 4c1.74 0 3.41.81 4.5 2.09C12.09 4.81 13.76 4 15.5 4 17.99 4 20 6.01 20 8.5c0 3.78-3.14 6.52-8.9 11.86l-1 1z"/>
+      </svg>
+      <span class="badge" id="badge-favoritos">0</span>
+    </button>
+
+    <!-- ALTERADO: agora é um link para carrinho.html -->
+    <a class="icon-btn" id="btn-carrinho" href="carrinho.html" aria-label="Ver carrinho">
+      <!-- ícone de carrinho -->
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 4h-2l-1 2h2l3.6 7.59-1.35 2.45A1 1 0 0010 18h8v-2h-7.42l.9-1.56L18 6H6.21l-.94-2zM7 20a2 2 0 110 4 2 2 0 010-4zm10 0a2 2 0 110 4 2 2 0 010-4z"/>
+      </svg>
+      <span class="badge" id="badge-carrinho">0</span>
+    </a>
+
+    <button class="btn-login" id="btn-login">Entrar</button>
+
+    <div class="perfil" tabindex="0" aria-haspopup="true" aria-expanded="false">
+      Perfil ▼
+    </div>
   </div>
 </header>
 
-<main>
-  <aside class="sidebar">
+
+
+
+
+
+
+
+<script>
+  // ...existing code...
+
+  // Botões do header: favoritos, carrinho, login
+  document.getElementById("btn-favoritos").addEventListener("click", () => {
+    if (favoritos.length === 0) {
+      alert("Você não tem favoritos.");
+      return;
+    }
+    const lista = favoritos.map(id => {
+      const p = produtos.find(x => x.id === id);
+      return p ? `- ${p.nome} (${p.preco})` : `- Produto ${id}`;
+    }).join("\n");
+    alert("Favoritos:\n" + lista);
+  });
+
+  // MANTIDO: navegação para a página de carrinho (link com href já faz a navegação).
+  // Não há mais alert exibido ao clicar no ícone do carrinho.
+
+  // ...existing code...
+</script> 
+
+
+
+
+
+
+
+<div class="conteudo-principal">
+  <aside>
     <h2>categorias</h2>
-    <nav>
-      <a href="#">camisas</a>
-      <a href="#">bonés</a>
-      <a href="#">ofertas</a>
-      <a href="#">novidades</a>
-    </nav>
+    <ul>
+      <li data-categoria="camisas">camisas</li>
+      <li data-categoria="bones">bonés</li>
+      <li data-categoria="ofertas">ofertas</li>
+      <li data-categoria="novidades">novidades</li>
+    </ul>
   </aside>
 
-  <section class="product-preview">
-  <div class="product-card">
-    <img src="camisa1.jpg" alt="Camisa 1" />
-    <div class="product-info">
-      <h3>Camisa Pantera Negra</h3>
-      <p class="price">R$ 79,90</p>
-      <div class="actions">
-        <button class="buy-btn">Comprar</button>
-        <button class="fav-btn" title="Adicionar aos favoritos">❤️</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="product-card">
-    <img src="camisa2.jpg" alt="Camisa 2" />
-    <div class="product-info">
-      <h3>Camisa Máscaras</h3>
-      <p class="price">R$ 69,90</p>
-      <div class="actions">
-        <button class="buy-btn">Comprar</button>
-        <button class="fav-btn" title="Adicionar aos favoritos">❤️</button>
-      </div>
-    </div>
-  </div>
-</section>
-
-  
-
-
-
-
-
-
-</main>
+  <main id="produtos-container">
+    <!-- Produtos gerados via JS -->
+  </main>
+</div>
 
 <footer>
-  <p>© 2025 Loja de Camisas. Todos os direitos reservados.</p>
+  © 2025 Loja de Camisas. Todos os direitos reservados.
 </footer>
+
+<script>
+  // Dados dos produtos
+  const produtos = [
+    {
+      id: 1,
+      nome: "Camisa Pantera Negra",
+      preco: "R$ 79,90",
+      categoria: "camisas",
+      img: "https://via.placeholder.com/180x140?text=Camisa+Pantera+Negra",
+    },
+    {
+      id: 2,
+      nome: "Camisa Máscaras",
+      preco: "R$ 69,90",
+      categoria: "camisas",
+      img: "https://via.placeholder.com/180x140?text=Camisa+Máscaras",
+    },
+    // Pode adicionar mais produtos aqui...
+  ];
+
+  const produtosContainer = document.getElementById("produtos-container");
+  const searchInput = document.getElementById("searchInput");
+  const categorias = document.querySelectorAll("aside ul li");
+
+  // Favoritos e carrinho salvos no localStorage
+  let favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
+  let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+
+  // Elementos de badge
+  const badgeFavoritos = document.getElementById("badge-favoritos");
+  const badgeCarrinho = document.getElementById("badge-carrinho");
+
+  function atualizarBadges() {
+    badgeFavoritos.textContent = favoritos.length;
+    badgeCarrinho.textContent = carrinho.length;
+  }
+
+  // Função para mostrar produtos (filtra por texto e categoria)
+  function mostrarProdutos(filtroNome = "", filtroCategoria = "") {
+    produtosContainer.innerHTML = "";
+    const filtroMinusculo = filtroNome.toLowerCase();
+
+    let produtosFiltrados = produtos.filter(prod => {
+      const nomeMatch = prod.nome.toLowerCase().includes(filtroMinusculo);
+      const categoriaMatch = filtroCategoria ? prod.categoria === filtroCategoria : true;
+      return nomeMatch && categoriaMatch;
+    });
+
+    if (produtosFiltrados.length === 0) {
+      produtosContainer.innerHTML = "<p>Nenhum produto encontrado.</p>";
+      return;
+    }
+
+    produtosFiltrados.forEach(prod => {
+      const favoritoAtivo = favoritos.includes(prod.id);
+
+      const div = document.createElement("div");
+      div.classList.add("produto");
+      div.setAttribute("data-categoria", prod.categoria);
+      div.innerHTML = `
+        <img src="${prod.img}" alt="${prod.nome}" />
+        <h3>${prod.nome}</h3>
+        <div class="preco">${prod.preco}</div>
+        <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
+          <button class="btn-comprar" data-id="${prod.id}">Comprar</button>
+          <button class="btn-adic-carrinho" data-id="${prod.id}" title="Adicionar ao carrinho">+</button>
+          <span class="favorito ${favoritoAtivo ? 'favorito-ativo' : ''}" data-id="${prod.id}" role="button" aria-label="Favoritar">&#10084;</span>
+        </div>
+      `;
+      produtosContainer.appendChild(div);
+    });
+
+    // Eventos dos botões comprar/adicionar ao carrinho
+    document.querySelectorAll(".btn-comprar").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const id = parseInt(e.target.dataset.id);
+        const produto = produtos.find(p => p.id === id);
+        // Adiciona ao carrinho e atualiza badge
+        carrinho.push({ id: produto.id, nome: produto.nome, preco: produto.preco });
+        localStorage.setItem("carrinho", JSON.stringify(carrinho));
+        atualizarBadges();
+        alert(`Item adicionado ao carrinho: ${produto.nome}`);
+      });
+    });
+
+    // botão + para adicionar ao carrinho sem alerta grande
+    document.querySelectorAll(".btn-adic-carrinho").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const id = parseInt(e.target.dataset.id);
+        const produto = produtos.find(p => p.id === id);
+        carrinho.push({ id: produto.id, nome: produto.nome, preco: produto.preco });
+        localStorage.setItem("carrinho", JSON.stringify(carrinho));
+        atualizarBadges();
+      });
+    });
+
+    // Favoritar
+    document.querySelectorAll(".favorito").forEach(cora => {
+      cora.addEventListener("click", (e) => {
+        const id = parseInt(e.target.dataset.id);
+        if (favoritos.includes(id)) {
+          favoritos = favoritos.filter(fav => fav !== id);
+        } else {
+          favoritos.push(id);
+        }
+        localStorage.setItem("favoritos", JSON.stringify(favoritos));
+        mostrarProdutos(searchInput.value, filtroCategoriaAtivo);
+        atualizarBadges();
+      });
+    });
+  }
+
+  // Filtro categoria
+  let filtroCategoriaAtivo = "";
+
+  categorias.forEach(cat => {
+    cat.addEventListener("click", () => {
+      if (filtroCategoriaAtivo === cat.dataset.categoria) {
+        filtroCategoriaAtivo = "";
+        cat.style.textDecoration = "none";
+      } else {
+        filtroCategoriaAtivo = cat.dataset.categoria;
+        categorias.forEach(c => c.style.textDecoration = "none");
+        cat.style.textDecoration = "underline";
+      }
+      mostrarProdutos(searchInput.value, filtroCategoriaAtivo);
+    });
+  });
+
+  // Filtro busca
+  searchInput.addEventListener("input", () => {
+    mostrarProdutos(searchInput.value, filtroCategoriaAtivo);
+  });
+
+  // Botão buscar
+  document.getElementById("btnSearch").addEventListener("click", () => {
+    mostrarProdutos(searchInput.value, filtroCategoriaAtivo);
+  });
+
+  // Mostrar inicial
+  mostrarProdutos();
+  atualizarBadges();
+
+  // Menu Perfil (simples toggle)
+  const perfil = document.querySelector(".perfil");
+  let perfilAberto = false;
+  perfil.addEventListener("click", () => {
+    perfilAberto = !perfilAberto;
+    perfil.setAttribute("aria-expanded", perfilAberto);
+    alert("Aqui você pode colocar opções do perfil, login, etc.");
+  });
+
+  // Botão favoritos já acima; navegacão para carrinho é via link/href (sem alert)
+
+  // Login simples (mock)
+  const btnLogin = document.getElementById("btn-login");
+  btnLogin.addEventListener("click", () => {
+    const email = prompt("Informe seu e-mail para entrar (mock):");
+    if (email) {
+      localStorage.setItem("usuario", JSON.stringify({ email }));
+      // atualizar perfil visual
+      document.querySelector(".perfil").textContent = email.split("@")[0] + " ▼";
+      alert("Logado como: " + email);
+    }
+  });
+
+  // Se já houver usuário salvo, mostrar no perfil
+  const usuarioSalvo = JSON.parse(localStorage.getItem("usuario") || "null");
+  if (usuarioSalvo && usuarioSalvo.email) {
+    document.querySelector(".perfil").textContent = usuarioSalvo.email.split("@")[0] + " ▼";
+  }
+</script>
 
 </body>
 </html>
