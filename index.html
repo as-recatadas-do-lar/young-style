@@ -153,17 +153,29 @@
     background: white;
     border-radius: 6px;
     box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
-    width: 220px;
-    padding: 10px;
+    width: 340px;
+    padding: 14px;
     display: flex;
     flex-direction: column;
     align-items: center;
   }
-  .produto img {
-    width: 180px;
-    height: 140px;
-    object-fit: contain;
+  /* divisória exclusiva para a imagem do produto */
+  .produto .img-divider {
+    width: 100%;
+    height: 240px; /* altura da divisória */
+    overflow: hidden;
     border-radius: 4px;
+    background: #fafafa;
+    position: relative;
+  }
+  /* imagem ocupa todo o espaço da divisória */
+  .produto .img-divider img {
+    position: absolute;
+    inset: 0; /* top/right/bottom/left:0 */
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* preenche a divisória, pode cortar partes */
+    display: block;
   }
   .produto h3 {
     margin: 12px 0 8px 0;
@@ -232,6 +244,9 @@
     }
     .header-right { gap: 6px; }
     .icon-btn svg { width: 20px; height: 20px; }
+    /* ajustar tamanho dos cards em telas pequenas */
+    .produto { width: calc(100% - 32px); }
+    .produto .img-wrap { height: 200px; }
   }
 </style>
 </head>
@@ -332,17 +347,17 @@
   const produtos = [
     {
       id: 1,
-      nome: "Camisa Pantera Negra",
-      preco: "R$ 79,90",
+      nome: "camisa carcass",
+      preco: "R$ 150,90",
       categoria: "camisas",
-      img: "https://via.placeholder.com/180x140?text=Camisa+Pantera+Negra",
+      img:"/imagens/c22.png",
     },
     {
       id: 2,
-      nome: "Camisa Máscaras",
-      preco: "R$ 69,90",
+      nome: "Camisa haggus",
+      preco: "R$ 200,90",
       categoria: "camisas",
-      img: "https://via.placeholder.com/180x140?text=Camisa+Máscaras",
+      img:"/imagens/camisahaggus.png",
     },
     // Pode adicionar mais produtos aqui...
   ];
@@ -387,7 +402,7 @@
       div.classList.add("produto");
       div.setAttribute("data-categoria", prod.categoria);
       div.innerHTML = `
-        <img src="${prod.img}" alt="${prod.nome}" />
+        <div class="img-divider"><img src="${prod.img}" alt="${prod.nome}" /></div>
         <h3>${prod.nome}</h3>
         <div class="preco">${prod.preco}</div>
         <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
